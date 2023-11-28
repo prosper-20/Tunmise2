@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .models import Properties
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -36,3 +36,27 @@ class NewHomePage(APIView):
             return Response({"Success": "House has been added",
                              "details": new_house.data}, status=status.HTTP_201_CREATED)
         return Response(new_house.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class PropertyDetailPage(APIView):
+    def get(self, request, id, format=None, *args, **kwargs):
+        # single_property = Properties.objects.get(id=id)
+        single_property = get_object_or_404(Properties, id=id)
+        serialized_property = PropertySerializer(single_property)
+        return Response(serialized_property.data, status=status.HTTP_200_OK)
+    
+    def put(self, request, id, format=None, *args, **kwargs):
+        single_property = Properties.objects.get(id=id)
+        serialized_property = PropertySerializer(single_property, data=request.data, partial=True)
+        if serialized_property.is_valid():
+            serialized_property.save()
+            return Response({"Success": "House details updated successfully!"}, status=status.HTTP_202_ACCEPTED)
+        return Response({'Error': 'Something went wrong!!'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, id, format=None, *args, **kwargs):
+        single_property = Properties.objects.get(id=id)
+        single_property.delete()
+        return Response({"Success": "Property deleted successfully!"}, status=status.HTTP_204_NO_CONTENT)
+
+
+
