@@ -6,3 +6,4 @@ urlpatterns = [
     path("", NewHomePage.as_view(), name="home-page"),
     path("<str:id>/", PropertyDetailPage.as_view(), name="detail-page")
 ]
+
